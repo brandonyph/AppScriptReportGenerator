@@ -1,8 +1,8 @@
 function PYP_Interim_Report() {
   //Define data and template ID
-  var templateId = '1bqVBjja0v3vGJjdLfBm-qxM2uEqE63OCdorLidrsSOg';
+  var templateId = '';
   var range = 'Score!A5:CS14'
-  var subjects = Sheets.Spreadsheets.Values.get('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA', range)
+  var subjects = Sheets.Spreadsheets.Values.get('', range)
   //Logger.log(subjects.values[0])
   //Logger.log(subjects.values[0][53])
 
@@ -17,17 +17,17 @@ function PYP_Interim_Report() {
   var theDate = curr_date + "/" + curr_month + "/" + curr_year + "-" + curr_hour + ":" + curr_min +  ":" + curr_sec
 
   //Create new folder for PDF and DOC
-  var dir = DriveApp.getFolderById("1WEBxKfV4v5ay1JyDNoeDwPQLy5Cm50fE");
+  var dir = DriveApp.getFolderById("");
   var docfolderdir = dir.createFolder("1.DOC." + theDate)
   var pdffolderdir = dir.createFolder("2.PDF." + theDate)
 
   //obtain numbers of replacement needed
-  var strands = SpreadsheetApp.openById('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
+  var strands = SpreadsheetApp.openById('').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
   //Logger.log(strands)
   //Logger.log(strands.length)
 
   //obtain reference tables for matching
-  var allresults = SpreadsheetApp.openById('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
+  var allresults = SpreadsheetApp.openById('').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
   //Logger.log(allresults)
   //Logger.log(allresults.indexOf(strands[8]))
 
