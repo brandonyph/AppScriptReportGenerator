@@ -1,0 +1,93 @@
+function PYP_Interim_Report() {
+  //Define data and template ID
+  var templateId = '1bqVBjja0v3vGJjdLfBm-qxM2uEqE63OCdorLidrsSOg';
+  var range = 'Score!A5:CS14'
+  var subjects = Sheets.Spreadsheets.Values.get('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA', range)
+  //Logger.log(subjects.values[0])
+  //Logger.log(subjects.values[0][53])
+
+  //Get time and date information
+  var d = new Date();
+  var curr_date = d.getDate();
+  var curr_month = d.getMonth() + 1; //Months are zero based
+  var curr_year = d.getFullYear();
+  var curr_hour = d.getHours()
+  var curr_min = d.getMinutes()
+  var curr_sec = d.getSeconds()
+  var theDate = curr_date + "/" + curr_month + "/" + curr_year + "-" + curr_hour + ":" + curr_min +  ":" + curr_sec
+
+  //Create new folder for PDF and DOC
+  var dir = DriveApp.getFolderById("1WEBxKfV4v5ay1JyDNoeDwPQLy5Cm50fE");
+  var docfolderdir = dir.createFolder("1.DOC." + theDate)
+  var pdffolderdir = dir.createFolder("2.PDF." + theDate)
+
+  //obtain numbers of replacement needed
+  var strands = SpreadsheetApp.openById('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
+  //Logger.log(strands)
+  //Logger.log(strands.length)
+
+  //obtain reference tables for matching
+  var allresults = SpreadsheetApp.openById('1RiJHlHSs1qs38-UqZpOQOZV-CAOXXkW3PxD_F-bQnEA').getSheetByName('Score').getRange('A2:CS2').getValues()[0]
+  //Logger.log(allresults)
+  //Logger.log(allresults.indexOf(strands[8]))
+
+  //Text Replacement
+  for (var i = 0; i < subjects.values.length; i++) {
+
+    var student = subjects.values[i][0];
+    var grd = subjects.values[i][1];
+    var cls = subjects.values[i][2];
+
+    //Make a copy of the template file
+    var newdoc = DriveApp.getFileById(templateId).makeCopy(docfolderdir);
+    var documentId = newdoc.getId();
+
+    //Rename the copied file
+    DriveApp.getFileById(documentId).setName('AY2021/2022-Q1-' + grd + cls + "-" + student)
+
+    //Get the document body as a variable
+    var body = DocumentApp.openById(documentId).getBody();
+    //var footer = DocumentApp.openById(documentId).getFooter()
+
+    for (var o = 0; o < strands.length; o++) {
+      var string = strands[o]
+      var colno = allresults.indexOf(string)
+      //Logger.log("string:" + string)
+      //Logger.log("colno:" + colno)
+
+      if (colno > -1) { body.replaceText(string, subjects.values[i][colno]) }
+    }
+    
+    delrows(documentId)
+
+    DocumentApp.openById(documentId).saveAndClose()
+
+    //generate new var for SaveAndClose()
+    var newdoc2 = DocumentApp.openById(documentId)
+    newdoc2.saveAndClose()
+
+    //generated docblock for pdf
+    docblob = newdoc2.getAs('application/pdf').setName(newdoc2.getName() + ".pdf");
+
+    //create new pdf file
+    var file = pdffolderdir.createFile(docblob);
+     Utilities.sleep(1000);
+
+     Logger.log(i+"-"+grd +"-"+ cls + "-" + student)
+  }
+}
+
+ //Functon to remove row with empty Final Grade (Students not taking subject)
+  function delrows(documentId) {
+    
+    var body = DocumentApp.openById(documentId).getBody();
+    var table = body.getTables()[1]
+    var p = 4
+
+    for(var q=4;q<44;q++){
+      //Logger.log(table.getCell(p,2).getText()+"---"+q)
+      if(table.getCell(p,2).getText() == 'NA'){table.removeRow(p)}
+      else{p=p+1}
+    }
+
+  }
